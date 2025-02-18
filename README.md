@@ -63,7 +63,3 @@ Collect unique items to expand the border!
 If you have any feature requests, please open an issue on
 GitHub.
 
-## Download
-
-The direct download link for the latest version is available
-[here](https://github.com/SimonDMC/BorderHoarder/releases/latest/download/BorderHoarder.jar).
