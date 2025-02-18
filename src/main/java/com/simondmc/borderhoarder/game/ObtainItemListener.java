@@ -2,8 +2,10 @@ package com.simondmc.borderhoarder.game;
 
 import com.simondmc.borderhoarder.BorderHoarder;
 import com.simondmc.borderhoarder.world.BorderWorldCreator;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,41 +19,41 @@ import org.bukkit.event.player.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class ObtainItemListener implements Listener {
+    private boolean isPlayerValid(Entity e){
+        if (!(e instanceof Player)) return false;
+        if (!(e.getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
+                e.getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
+                || e.getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName))) return false;
+        return (((Player) e).getPlayer().getGameMode().equals(GameMode.SURVIVAL));
+    }
 
     // picking up any dropped item from ground
     @EventHandler
     public void pickupItem(EntityPickupItemEvent e) {
-        if (!(e.getEntity() instanceof Player)) return;
-        if (!(e.getEntity().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getEntity().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getEntity().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName))) return;
+        if(!isPlayerValid(e.getEntity())) return;
         ItemHandler.gainItem(e.getItem().getItemStack().getType(), (Player) e.getEntity());
     }
 
     // filling a water/lava/milk bucket
     @EventHandler
     public void fillBucket(PlayerBucketFillEvent e) {
-        if (!(e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName))) return;
+        if(!isPlayerValid(e.getPlayer())) return;
         ItemHandler.gainItem(e.getItemStack().getType(), e.getPlayer());
     }
 
     // placing an obtained filled bucket (village loot chest?)
     @EventHandler
     public void emptyBucket(PlayerBucketEmptyEvent e) {
-        if (!(e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName))) return;
+        if(!isPlayerValid(e.getPlayer())) return;
+
         ItemHandler.gainItem(e.getItemStack().getType(), e.getPlayer());
     }
 
     // catching a fish into a bucket
     @EventHandler
     public void catchFishIntoBucket(PlayerInteractEntityEvent e) {
-        if (!(e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName))) return;
+        if(!isPlayerValid(e.getPlayer())) return;
+
         if (!(e.getRightClicked() instanceof Fish)) return;
         if (e.getPlayer().getInventory().getItem(e.getHand()) == null) return;
         if (e.getPlayer().getInventory().getItem(e.getHand()).getType() == Material.WATER_BUCKET) {
@@ -69,9 +71,8 @@ public class ObtainItemListener implements Listener {
     // filling a bottle or map
     @EventHandler
     public void fillBottleOrMap(PlayerInteractEvent e) {
-        if (!(e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName))) return;
+        if(!isPlayerValid(e.getPlayer())) return;
+
         if (e.getItem() == null) return;
         if (e.getItem().getType() == Material.GLASS_BOTTLE || e.getItem().getType() == Material.MAP) {
             new BukkitRunnable() {
@@ -88,9 +89,8 @@ public class ObtainItemListener implements Listener {
     // trading with a villager
     @EventHandler
     public void trade(PlayerStatisticIncrementEvent e) {
-        if (!(e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getPlayer().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName))) return;
+        if(!isPlayerValid(e.getPlayer())) return;
+
         if (e.getStatistic() != Statistic.TRADED_WITH_VILLAGER) return;
         new BukkitRunnable() {
 
@@ -110,10 +110,8 @@ public class ObtainItemListener implements Listener {
     // crafting any item
     @EventHandler
     public void craft(CraftItemEvent e) {
-        if (!(e.getWhoClicked().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getWhoClicked().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getWhoClicked().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName)))
-            return;
+        if(!isPlayerValid(e.getWhoClicked())) return;
+
         Material craftedItem = e.getCurrentItem().getType();
         new BukkitRunnable() {
 
@@ -130,10 +128,8 @@ public class ObtainItemListener implements Listener {
     // getting an item from a chest/whatever other container
     @EventHandler
     public void inventoryGet(InventoryClickEvent e) {
-        if (!(e.getWhoClicked().getLocation().getWorld().getName().equals(BorderWorldCreator.worldName) ||
-                e.getWhoClicked().getLocation().getWorld().getName().equals(BorderWorldCreator.netherWorldName)
-                || e.getWhoClicked().getLocation().getWorld().getName().equals(BorderWorldCreator.endWorldName)))
-            return;
+        if(!isPlayerValid(e.getWhoClicked())) return;
+
         if (e.getClickedInventory() == null) return;
 
         // shift click item from somewhere else

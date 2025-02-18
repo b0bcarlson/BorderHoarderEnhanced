@@ -40,7 +40,7 @@ public class ItemHandler {
             // save data
             DataHandler.saveData();
             // update tab
-            TabHandler.updateTab();
+            ScoreboardHandler.updateScoreboard();
         }
     }
 
